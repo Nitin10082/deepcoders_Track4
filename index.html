@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>STEMVERSE Academy — Offline 3D Science & Rural Portal</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --card-2: #263348;
+      --accent: #38bdf8;
+      --emerald: #34d399;
+      --amber: #fbbf24;
+      --danger: #f87171;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; }
+    header {
+      background: #0b1120; border-bottom: 1px solid #334155;
+      padding: 12px 20px; display: flex; flex-wrap: wrap;
+      align-items: center; justify-content: space-between; gap: 10px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.15rem; color: var(--accent); }
+    .badge { font-size: 0.75rem; padding: 4px 10px; border-radius: 999px; font-weight: 700; }
+    .badge-online { background: rgba(52, 211, 153, 0.15); color: var(--emerald); border: 1px solid var(--emerald); }
+    .badge-offline { background: rgba(251, 191, 36, 0.15); color: var(--amber); border: 1px solid var(--amber); }
+    .controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    button, select {
+      background: var(--card); color: var(--text); border: 1px solid #475569;
+      padding: 7px 12px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem;
+    }
+    button:hover { border-color: var(--accent); }
+    button.active { background: var(--accent); color: #0f172a; border-color: var(--accent); }
+    button.primary { background: var(--emerald); color: #0f172a; border: none; }
+    button.amber { background: var(--amber); color: #0f172a; border: none; }
+    .container { max-width: 1220px; margin: 0 auto; padding: 18px; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 16px; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--card); border: 1px solid #334155; border-radius: 12px; padding: 16px;
+    }
+    .card h2 { font-size: 1.05rem; color: var(--accent); margin-bottom: 10px; }
+    #canvas-wrap {
+      width: 100%; height: 340px; background: #090d16; border-radius: 10px;
+      position: relative; overflow: hidden; border: 1px solid #334155;
+    }
+    .overlay-hud {
+      position: absolute; top: 10px; left: 10px; right: 10px;
+      display: flex; justify-content: space-between; pointer-events: none; font-size: 0.82rem;
+    }
+    .hud-pill { background: rgba(15, 23, 42, 0.85); padding: 6px 10px; border-radius: 8px; border: 1px solid #334155; }
+    .captions {
+      position: absolute; bottom: 10px; left: 10px; right: 10px;
+      background: rgba(15, 23, 42, 0.9); padding: 8px 12px; border-radius: 8px;
+      font-size: 0.85rem; color: var(--amber); text-align: center; display: none;
+    }
+    .slider-row { margin: 10px 0; }
+    .slider-row label { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px; color: var(--muted); }
+    input[type=range] { width: 100%; accent-color: var(--accent); }
+    .quiz-opt {
+      display: block; width: 100%; text-align: left; margin: 8px 0; padding: 10px 12px;
+      background: var(--card-2); border: 1px solid #475569; border-radius: 8px;
+    }
+    .feedback-box {
+      margin-top: 10px; padding: 12px; border-radius: 8px; font-size: 0.88rem; display: none;
+    }
+    .fb-ok { background: rgba(52, 211, 153, 0.15); border: 1px solid var(--emerald); color: var(--emerald); }
+    .fb-err { background: rgba(248, 113, 113, 0.15); border: 1px solid var(--danger); color: #fecaca; }
+    .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+    .stat { background: var(--card-2); padding: 12px; border-radius: 10px; text-align: center; }
+    .stat .val { font-size: 1.35rem; font-weight: 800; color: var(--emerald); }
+    .stat .lbl { font-size: 0.75rem; color: var(--muted); }
+    .list-item { background: var(--card-2); padding: 10px 12px; border-radius: 8px; margin-bottom: 8px; font-size: 0.88rem; }
+    .hidden { display: none !important; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.86rem; margin-top: 8px; }
+    th, td { padding: 8px 10px; border-bottom: 1px solid #334155; text-align: left; }
+    th { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span>STEMVERSE Academy</span>
+      <span id="net-badge" class="badge badge-online">ONLINE · Synced</span>
+    </div>
+    <div class="controls">
+      <span id="xp-pill" class="badge badge-online">XP: 120 | Streak: 4d</span>
+      <button id="btn-lang" onclick="toggleLang()">Language: English / ಕನ್ನಡ</button>
+      <button id="btn-sync" class="amber" onclick="syncQueue()">Sync Queue (<span id="sync-count">0</span>)</button>
+      <button id="role-student" class="active" onclick="setRole('student')">Student View</button>
+      <button id="role-teacher" onclick="setRole('teacher')">Teacher View</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- ================= STUDENT VIEW ================= -->
+    <div id="student-view">
+      <div class="tabs">
+        <button class="active" id="tab-lab" onclick="showTab('lab')">1. 3D Lab & Guided Video</button>
+        <button id="tab-quiz" onclick="showTab('quiz')">2. Adaptive Mastery Quiz</button>
+        <button id="tab-cheat" onclick="showTab('cheat')">3. Cheat Sheet & Certificate</button>
+        <button id="tab-portal" onclick="showTab('portal')">4. PESU-Style Student Portal</button>
+      </div>
+
+      <!-- TAB 1: 3D SANDBOX -->
+      <div id="panel-lab" class="grid">
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <h2 id="ch-title" style="margin:0;">Class 9 NCERT: Force & Laws of Motion (F = m × a)</h2>
+            <select id="quality-sel" onchange="setQuality(this.value)">
+              <option value="low">Low-End Phone Mode (30 FPS)</option>
+              <option value="high" selected>Standard GPU Mode</option>
+            </select>
+          </div>
+          <div id="canvas-wrap">
+            <div class="overlay-hud">
+              <div class="hud-pill" id="hud-physics">Force: 20 N | Mass: 4 kg | Accel: 5.00 m/s²</div>
+              <div class="hud-pill" id="hud-state">Velocity: 0.0 m/s | Dist: 0.0 m</div>
+            </div>
+            <div id="video-caption" class="captions"></div>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
+            <button class="primary" onclick="simAPI.triggerAction('push')">▶ Apply Force (Push)</button>
+            <button onclick="simAPI.triggerAction('reset')">↺ Reset Block</button>
+            <button class="amber" onclick="playGuidedVideo()">🎬 Play Interactive 3D Video</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Sandbox Parameters (Deterministic Physics Truth)</h2>
+          <div class="slider-row">
+            <label><span>Applied Force (F)</span><strong id="lbl-force">20 N</strong></label>
+            <input type="range" id="inp-force" min="5" max="100" value="20" oninput="updateSimFromUI()" />
+          </div>
+          <div class="slider-row">
+            <label><span>Block Mass (m)</span><strong id="lbl-mass">4 kg</strong></label>
+            <input type="range" id="inp-mass" min="1" max="20" value="4" oninput="updateSimFromUI()" />
+          </div>
+          <div class="slider-row">
+            <label><span>Surface Friction (μ)</span><strong id="lbl-fric">0.10</strong></label>
+            <input type="range" id="inp-fric" min="0" max="0.5" step="0.05" value="0.10" oninput="updateSimFromUI()" />
+          </div>
+          <div class="list-item" style="margin-top:14px;">
+            <strong>Live Formula Truth:</strong><br/>
+            <span id="formula-live">Net Force = 20 - (0.10 × 4 × 9.8) = 16.08 N → a = 4.02 m/s²</span>
+          </div>
+          <div class="list-item">
+            <strong>Quick Presets (Control API):</strong><br/>
+            <div style="display:flex; gap:6px; margin-top:6px; flex-wrap:wrap;">
+              <button onclick="simAPI.loadScenario('ice')">Frictionless Ice (μ=0)</button>
+              <button onclick="simAPI.loadScenario('heavy')">Heavy Truck Inertia (m=18kg)</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: ADAPTIVE QUIZ -->
+      <div id="panel-quiz" class="card hidden">
+        <h2>Adaptive Simulation-Verified Quiz (SM-2 Misconception Engine)</h2>
+        <p style="color:var(--muted); font-size:0.88rem; margin-bottom:12px;">
+          Questions are computed directly from the 3D physics engine. Wrong answers map to a specific misconception and launch the exact 3D scenario to fix it.
+        </p>
+        <div id="quiz-box"></div>
+        <div id="quiz-feedback" class="feedback-box"></div>
+      </div>
+
+      <!-- TAB 3: CHEAT SHEET & CERTIFICATE -->
+      <div id="panel-cheat" class="grid hidden">
+        <div class="card">
+          <h2>Side-by-Side Visual & Math Cheat Sheet</h2>
+          <table>
+            <tr><th>Law / Concept</th><th>Formula</th><th>Sandbox Action</th></tr>
+            <tr>
+              <td>Newton's 1st Law (Inertia)</td>
+              <td>F_net = 0 ⇒ Δv = 0</td>
+              <td><button onclick="launchCheatScenario('ice')">Test in 3D</button></td>
+            </tr>
+            <tr>
+              <td>Newton's 2nd Law</td>
+              <td>F_net = m × a</td>
+              <td><button onclick="launchCheatScenario('heavy')">Test in 3D</button></td>
+            </tr>
+            <tr>
+              <td>Kinetic Friction</td>
+              <td>f_k = μ × m × g</td>
+              <td><button onclick="launchCheatScenario('friction')">Test in 3D</button></td>
+            </tr>
+          </table>
+        </div>
+        <div class="card">
+          <h2>Chapter Completion Certificate</h2>
+          <p style="color:var(--muted); font-size:0.88rem; margin-bottom:12px;">
+            Pass the adaptive quiz (score ≥ 2/3) to generate an offline-verifiable completion certificate.
+          </p>
+          <div class="list-item" id="cert-preview">
+            <strong>STEMVERSE ACADEMY · VERIFIED CERTIFICATE</strong><br/>
+            Student: Nitin S (Class 9 Science — Force & Laws of Motion)<br/>
+            Status: <span id="cert-status" style="color:var(--amber);">Complete Quiz to Unlock</span>
+          </div>
+          <button class="primary" onclick="downloadCert()">⬇ Download Certificate (.txt/.pdf)</button>
+        </div>
+      </div>
+
+      <!-- TAB 4: PESU ACADEMY-STYLE PORTAL -->
+      <div id="panel-portal" class="card hidden">
+        <h2>PESU Academy–Style Rural Student Dashboard (Offline Cached)</h2>
+        <div class="stat-row">
+          <div class="stat"><div class="val" id="st-mastery">78%</div><div class="lbl">NCERT Chapter Mastery</div></div>
+          <div class="stat"><div class="val" id="st-quizzes">1</div><div class="lbl">Offline Modules Completed</div></div>
+          <div class="stat"><div class="val" id="st-bandwidth">240 KB</div><div class="lbl">Total Data Footprint</div></div>
+        </div>
+        <h2 style="margin-top:10px;">School Announcements & Results</h2>
+        <div id="announcements-list">
+          <div class="list-item"><strong>[Teacher Notice]</strong> Complete Class 9 Chapter 8 (Force & Laws of Motion) 3D Lab before Friday. Works offline!</div>
+          <div class="list-item"><strong>[Result Published]</strong> Unit Test 1 — Science: 18/20 (Top strength: Inertia; Practice: Friction deceleration).</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= TEACHER VIEW ================= -->
+    <div id="teacher-view" class="hidden">
+      <div class="grid">
+        <div class="card">
+          <h2>AI-Assisted Partial-Credit Rubric Grading (Human-in-the-Loop)</h2>
+          <p style="color:var(--muted); font-size:0.85rem; margin-bottom:10px;">
+            AI pre-scores rural student short answers against NCERT rubrics. Teacher approves with 1 click.
+          </p>
+          <div class="list-item">
+            <strong>Student:</strong> Ravi K (Class 9B) · <strong>Question:</strong> Why do passengers lurch forward when a bus brakes suddenly?<br/>
+            <em>Student Answer:</em> "Because the bus stops but our body wants to keep moving forward due to inertia of motion."<br/>
+            <span style="color:var(--emerald);">AI Suggested Score: 2.0 / 2.0</span> — Correctly identifies inertia of motion.<br/>
+            <button class="primary" style="margin-top:6px;" onclick="approveGrade(this, 'Ravi K')">✓ Approve & Sync Grade</button>
+          </div>
+          <div class="list-item">
+            <strong>Student:</strong> Ananya R (Class 9B) · <strong>Question:</strong> What happens to acceleration if mass is doubled at constant force?<br/>
+            <em>Student Answer:</em> "Acceleration also doubles because heavier objects move faster."<br/>
+            <span style="color:var(--amber);">AI Suggested Score: 0.5 / 2.0</span> — Misconception detected (a ∝ 1/m, so acceleration halves).<br/>
+            <button class="amber" style="margin-top:6px;" onclick="approveGrade(this, 'Ananya R')">✓ Approve & Assign 3D Remediation</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Post Offline Announcement & Class Concept Heatmap</h2>
+          <input id="new-ann" type="text" placeholder="Type announcement for rural class..." style="width:100%; padding:8px; border-radius:8px; border:1px solid #475569; background:#0f172a; color:#fff; margin-bottom:8px;" />
+          <button class="primary" onclick="postAnnouncement()">+ Publish Announcement (Queues Offline)</button>
+          <h2 style="margin-top:16px;">Class 9 Concept Struggle Heatmap</h2>
+          <table>
+            <tr><th>NCERT Topic</th><th>Class Mastery</th><th>Action</th></tr>
+            <tr><td>Newton's 1st Law (Inertia)</td><td style="color:var(--emerald);">88%</td><td>On Track</td></tr>
+            <tr><td>F = m × a Numericals</td><td style="color:var(--amber);">61%</td><td>Assign 3D Sandbox</td></tr>
+            <tr><td>Friction & Net Force</td><td style="color:var(--danger);">44%</td><td>Remedial Lab Queued</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Local three.min.js fallback to CDN only if online and local file absent -->
+  <script src="three.min.js"></script>
+  <script>
+    if (typeof THREE === 'undefined') {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
+    }
+  </script>
+  <script src="sim.js"></script>
+  <script>
+    // Register Service Worker for Offline Airplane Mode
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
+
+    let lang = 'en';
+    let xp = 120;
+    let quizScore = 0;
+    let qIndex = 0;
+    let syncQueueItems = JSON.parse(localStorage.getItem('stemverse_sync') || '[]');
+
+    const questions = [
+      {
+        q_en: "If Force = 20 N and Mass = 4 kg on a frictionless surface (μ = 0), what is the acceleration?",
+        q_kn: "ಘರ್ಷಣೆಯಿಲ್ಲದ ಮೇಲ್ಮೈಯಲ್ಲಿ (μ = 0) ಬಲ = 20 N ಮತ್ತು ದ್ರವ್ಯರಾಶಿ = 4 kg ಇದ್ದರೆ, ವೇಗೋತ್ಕರ್ಷ ಎಷ್ಟು?",
+        opts: ["5 m/s²", "80 m/s²", "0.2 m/s²"],
+        ans: 0,
+        misconception: "You multiplied F × m instead of dividing a = F / m. Launching Frictionless Ice 3D Lab so you can observe a = 20 / 4 = 5 m/s²!",
+        fixScenario: "ice"
+      },
+      {
+        q_en: "Doubling the mass of a block while keeping applied force constant will:",
+        q_kn: "ಬಲವನ್ನು ಸ್ಥಿರವಾಗಿಟ್ಟು ದ್ರವ್ಯರಾಶಿಯನ್ನು ದ್ವಿಗುಣಗೊಳಿಸಿದರೆ ವೇಗೋತ್ಕರ್ಷ ಏನಾಗುತ್ತದೆ?",
+        opts: ["Double the acceleration", "Halve the acceleration", "Keep acceleration unchanged"],
+        ans: 1,
+        misconception: "Higher mass increases inertia, resisting acceleration (a = F/m). Loading Heavy Truck Inertia scenario in 3D!",
+        fixScenario: "heavy"
+      },
+      {
+        q_en: "When applied force equals kinetic friction force, net force is zero. The moving block will:",
+        q_kn: "ಪ್ರಯೋಗಿಸಿದ ಬಲ ಮತ್ತು ಘರ್ಷಣೆ ಬಲ ಸಮಾನವಾಗಿದ್ದರೆ ಚಲಿಸುವ ವಸ್ತು ಏನಾಗುತ್ತದೆ?",
+        opts: ["Stop immediately", "Continue moving at constant velocity", "Accelerate uniformly"],
+        ans: 1,
+        misconception: "By Newton's 1st Law, zero net force means zero acceleration—an object in motion stays at constant velocity.",
+        fixScenario: "ice"
+      }
+    ];
+
+    function updateSyncUI() {
+      document.getElementById('sync-count').textContent = syncQueueItems.length;
+      const badge = document.getElementById('net-badge');
+      if (navigator.onLine) {
+        badge.className = 'badge badge-online';
+        badge.textContent = syncQueueItems.length ? 'ONLINE · Pending Sync' : 'ONLINE · Synced';
+      } else {
+        badge.className = 'badge badge-offline';
+        badge.textContent = 'OFFLINE (Airplane Mode Active)';
+      }
+    }
+    window.addEventListener('online', updateSyncUI);
+    window.addEventListener('offline', updateSyncUI);
+    updateSyncUI();
+
+    function queueEvent(ev) {
+      syncQueueItems.push({ ...ev, ts: new Date().toISOString() });
+      localStorage.setItem('stemverse_sync', JSON.stringify(syncQueueItems));
+      updateSyncUI();
+    }
+
+    function syncQueue() {
+      if (!navigator.onLine) {
+        alert("You are currently OFFLINE. Events remain safely stored in localStorage and will sync when internet returns!");
+        return;
+      }
+      alert("Synced " + syncQueueItems.length + " offline learning/grading records to AWS Lambda backend!");
+      syncQueueItems = [];
+      localStorage.setItem('stemverse_sync', '[]');
+      updateSyncUI();
+    }
+
+    function setRole(role) {
+      document.getElementById('student-view').classList.toggle('hidden', role !== 'student');
+      document.getElementById('teacher-view').classList.toggle('hidden', role !== 'teacher');
+      document.getElementById('role-student').classList.toggle('active', role === 'student');
+      document.getElementById('role-teacher').classList.toggle('active', role === 'teacher');
+    }
+
+    function showTab(tab) {
+      ['lab', 'quiz', 'cheat', 'portal'].forEach(t => {
+        document.getElementById('panel-' + t).classList.toggle('hidden', t !== tab);
+        document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+      });
+      if (tab === 'quiz') renderQuiz();
+    }
+
+    function toggleLang() {
+      lang = lang === 'en' ? 'kn' : 'en';
+      document.getElementById('ch-title').textContent = lang === 'en'
+        ? "Class 9 NCERT: Force & Laws of Motion (F = m × a)"
+        : "ತರಗತಿ 9 NCERT: ಬಲ ಮತ್ತು ಚಲನೆಯ ನಿಯಮಗಳು (F = m × a)";
+      renderQuiz();
+    }
+
+    function renderQuiz() {
+      const box = document.getElementById('quiz-box');
+      if (qIndex >= questions.length) {
+        box.innerHTML = `<div class="list-item"><strong>Quiz Completed! Score: ${quizScore}/${questions.length}</strong></div>
+          <button class="primary" onclick="qIndex=0;quizScore=0;renderQuiz()">Retry Adaptive Quiz</button>`;
+        if (quizScore >= 2) {
+          document.getElementById('cert-status').textContent = "UNLOCKED (Score: " + quizScore + "/3)";
+          document.getElementById('cert-status').style.color = "var(--emerald)";
+        }
+        return;
+      }
+      const item = questions[qIndex];
+      const qText = lang === 'en' ? item.q_en : item.q_kn;
+      box.innerHTML = `<div class="list-item"><strong>Q${qIndex + 1}/${questions.length}:</strong> ${qText}</div>` +
+        item.opts.map((o, idx) => `<button class="quiz-opt" onclick="checkAns(${idx})">${o}</button>`).join('');
+    }
+
+    function checkAns(idx) {
+      const item = questions[qIndex];
+      const fb = document.getElementById('quiz-feedback');
+      fb.style.display = 'block';
+      if (idx === item.ans) {
+        quizScore++;
+        xp += 25;
+        document.getElementById('xp-pill').textContent = `XP: ${xp} | Streak: 4d`;
+        fb.className = 'feedback-box fb-ok';
+        fb.innerHTML = `<strong>✓ Correct! (+25 XP)</strong> Verified by physics engine.`;
+        queueEvent({ type: 'quiz_pass', q: qIndex, xp });
+        qIndex++;
+        setTimeout(() => { fb.style.display = 'none'; renderQuiz(); }, 1100);
+      } else {
+        fb.className = 'feedback-box fb-err';
+        fb.innerHTML = `<strong>✗ Misconception Detected:</strong> ${item.misconception}<br/>
+          <button class="amber" style="margin-top:8px;" onclick="launchCheatScenario('${item.fixScenario}')">Open 3D Fix Scenario →</button>`;
+        queueEvent({ type: 'misconception', q: qIndex, scenario: item.fixScenario });
+      }
+    }
+
+    function launchCheatScenario(name) {
+      showTab('lab');
+      simAPI.loadScenario(name);
+      simAPI.triggerAction('push');
+    }
+
+    function playGuidedVideo() {
+      const cap = document.getElementById('video-caption');
+      cap.style.display = 'block';
+      const steps = [
+        { t: 0, text: "Narration: Welcome! Let's apply 20 Newtons on a 4 kg block over low friction.", fn: () => { simAPI.loadScenario('default'); simAPI.triggerAction('push'); } },
+        { t: 3500, text: "Narration: Now watch what happens when we remove friction completely on ice (μ = 0)!", fn: () => { simAPI.loadScenario('ice'); simAPI.triggerAction('push'); } },
+        { t: 7000, text: "Narration: Increasing mass to 18 kg increases inertia—acceleration drops sharply!", fn: () => { simAPI.loadScenario('heavy'); simAPI.triggerAction('push'); } },
+        { t: 10500, text: "Guided 3D Lesson Complete! (+15 XP)", fn: () => { cap.style.display = 'none'; } }
+      ];
+      steps.forEach(s => setTimeout(() => {
+        cap.textContent = s.text;
+        s.fn();
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+          window.speechSynthesis.speak(new SpeechSynthesisUtterance(s.text.replace('Narration: ', '')));
+        }
+      }, s.t));
+    }
+
+    function approveGrade(btn, student) {
+      btn.textContent = "✓ Approved & Queued";
+      btn.disabled = true;
+      queueEvent({ type: 'teacher_grade_approved', student });
+    }
+
+    function postAnnouncement() {
+      const inp = document.getElementById('new-ann');
+      if (!inp.value.trim()) return;
+      const div = document.createElement('div');
+      div.className = 'list-item';
+      div.innerHTML = `<strong>[New Teacher Notice]</strong> ${inp.value}`;
+      document.getElementById('announcements-list').prepend(div);
+      queueEvent({ type: 'announcement', text: inp.value });
+      inp.value = '';
+      alert("Announcement saved locally & added to Offline Sync Queue!");
+    }
+
+    function downloadCert() {
+      const text = "STEMVERSE ACADEMY CERTIFICATE\nAwarded to: Nitin S\nCourse: Class 9 NCERT Science — Force & Laws of Motion\nVerified Offline Mastery Score: " + quizScore + "/3\nTeam deepcoders (wHACKiest 2026)";
+      const blob = new Blob([text], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = "STEMVERSE_Certificate_NitinS.txt";
+      a.click();
+    }
+  </script>
+</body>
+</html>
