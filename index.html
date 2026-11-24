@@ -3,451 +3,1023 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>STEMVERSE Academy — Offline 3D Science & Rural Portal</title>
+  <title>SchoolSaathi — Offline 3D Learning & Rural Classroom Portal</title>
   <style>
     :root {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --card-2: #263348;
-      --accent: #38bdf8;
-      --emerald: #34d399;
-      --amber: #fbbf24;
+      --bg: #070708;
+      --surface: #111114;
+      --surface-elevated: #18181d;
+      --border: #27272f;
+      --gold: #d4af37;
+      --gold-light: #f3d06b;
+      --gold-dim: rgba(212, 175, 55, 0.14);
+      --text: #f5f5f7;
+      --muted: #9ca3af;
+      --success: #4ade80;
       --danger: #f87171;
-      --text: #f8fafc;
-      --muted: #94a3b8;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-    body { background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* Top Bar */
     header {
-      background: #0b1120; border-bottom: 1px solid #334155;
-      padding: 12px 20px; display: flex; flex-wrap: wrap;
-      align-items: center; justify-content: space-between; gap: 10px;
+      background: rgba(11, 11, 13, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
     }
-    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.15rem; color: var(--accent); }
-    .badge { font-size: 0.75rem; padding: 4px 10px; border-radius: 999px; font-weight: 700; }
-    .badge-online { background: rgba(52, 211, 153, 0.15); color: var(--emerald); border: 1px solid var(--emerald); }
-    .badge-offline { background: rgba(251, 191, 36, 0.15); color: var(--amber); border: 1px solid var(--amber); }
-    .controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      color: #070708;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      font-size: 1rem;
+    }
+
+    .brand-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--gold-light);
+    }
+
+    .brand-sub {
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .pill {
+      font-size: 0.75rem;
+      padding: 4px 11px;
+      border-radius: 999px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--gold-light);
+    }
+
+    .pill.offline {
+      border-color: var(--gold);
+      background: var(--gold-dim);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
     button, select {
-      background: var(--card); color: var(--text); border: 1px solid #475569;
-      padding: 7px 12px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem;
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s ease;
     }
-    button:hover { border-color: var(--accent); }
-    button.active { background: var(--accent); color: #0f172a; border-color: var(--accent); }
-    button.primary { background: var(--emerald); color: #0f172a; border: none; }
-    button.amber { background: var(--amber); color: #0f172a; border: none; }
-    .container { max-width: 1220px; margin: 0 auto; padding: 18px; }
-    .tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
-    .grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 16px; }
-    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+
+    button:hover {
+      border-color: var(--gold);
+      color: var(--gold-light);
+    }
+
+    button.active, button.gold-btn {
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      color: #070708;
+      border-color: var(--gold);
+      font-weight: 700;
+    }
+
+    button.gold-btn:hover {
+      filter: brightness(1.06);
+      color: #070708;
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 20px 48px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .grid-main {
+      display: grid;
+      grid-template-columns: 1.45fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 880px) {
+      .grid-main, .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
     .card {
-      background: var(--card); border: 1px solid #334155; border-radius: 12px; padding: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
     }
-    .card h2 { font-size: 1.05rem; color: var(--accent); margin-bottom: 10px; }
-    #canvas-wrap {
-      width: 100%; height: 340px; background: #090d16; border-radius: 10px;
-      position: relative; overflow: hidden; border: 1px solid #334155;
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      gap: 10px;
     }
-    .overlay-hud {
-      position: absolute; top: 10px; left: 10px; right: 10px;
-      display: flex; justify-content: space-between; pointer-events: none; font-size: 0.82rem;
+
+    .card h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--gold-light);
+      letter-spacing: -0.01em;
     }
-    .hud-pill { background: rgba(15, 23, 42, 0.85); padding: 6px 10px; border-radius: 8px; border: 1px solid #334155; }
-    .captions {
-      position: absolute; bottom: 10px; left: 10px; right: 10px;
-      background: rgba(15, 23, 42, 0.9); padding: 8px 12px; border-radius: 8px;
-      font-size: 0.85rem; color: var(--amber); text-align: center; display: none;
+
+    /* Glitch-Free Pure HTML5 Canvas 3D Sandbox */
+    .sandbox-frame {
+      position: relative;
+      width: 100%;
+      height: 340px;
+      background: radial-gradient(circle at 50% 35%, #191712 0%, #09090b 100%);
+      border: 1px solid #2e2a1e;
+      border-radius: 12px;
+      overflow: hidden;
     }
-    .slider-row { margin: 10px 0; }
-    .slider-row label { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px; color: var(--muted); }
-    input[type=range] { width: 100%; accent-color: var(--accent); }
-    .quiz-opt {
-      display: block; width: 100%; text-align: left; margin: 8px 0; padding: 10px 12px;
-      background: var(--card-2); border: 1px solid #475569; border-radius: 8px;
+
+    canvas#simCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
     }
-    .feedback-box {
-      margin-top: 10px; padding: 12px; border-radius: 8px; font-size: 0.88rem; display: none;
+
+    .hud-top {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      pointer-events: none;
+      flex-wrap: wrap;
     }
-    .fb-ok { background: rgba(52, 211, 153, 0.15); border: 1px solid var(--emerald); color: var(--emerald); }
-    .fb-err { background: rgba(248, 113, 113, 0.15); border: 1px solid var(--danger); color: #fecaca; }
-    .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
-    .stat { background: var(--card-2); padding: 12px; border-radius: 10px; text-align: center; }
-    .stat .val { font-size: 1.35rem; font-weight: 800; color: var(--emerald); }
-    .stat .lbl { font-size: 0.75rem; color: var(--muted); }
-    .list-item { background: var(--card-2); padding: 10px 12px; border-radius: 8px; margin-bottom: 8px; font-size: 0.88rem; }
-    .hidden { display: none !important; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.86rem; margin-top: 8px; }
-    th, td { padding: 8px 10px; border-bottom: 1px solid #334155; text-align: left; }
-    th { color: var(--accent); }
+
+    .hud-chip {
+      background: rgba(10, 10, 12, 0.85);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      color: var(--gold-light);
+      padding: 5px 10px;
+      border-radius: 7px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
+    .caption-bar {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      right: 12px;
+      background: rgba(10, 10, 12, 0.92);
+      border: 1px solid var(--gold);
+      color: var(--gold-light);
+      padding: 9px 14px;
+      border-radius: 8px;
+      font-size: 0.84rem;
+      text-align: center;
+      display: none;
+    }
+
+    .controls-bar {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    /* Sliders & Info Blocks */
+    .control-group {
+      margin-bottom: 14px;
+    }
+
+    .control-group label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.83rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .control-group strong {
+      color: var(--gold-light);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--gold);
+      cursor: pointer;
+    }
+
+    .box-subtle {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 0.85rem;
+      margin-top: 12px;
+    }
+
+    .box-gold {
+      background: var(--gold-dim);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 0.85rem;
+      margin-top: 12px;
+      color: var(--gold-light);
+    }
+
+    /* Quiz */
+    .quiz-option {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 12px 14px;
+      margin: 8px 0;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .quiz-option:hover {
+      border-color: var(--gold);
+      background: #1f1d17;
+    }
+
+    .feedback {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 0.86rem;
+      display: none;
+    }
+
+    .feedback.ok {
+      background: rgba(74, 222, 128, 0.12);
+      border: 1px solid var(--success);
+      color: var(--success);
+    }
+
+    .feedback.err {
+      background: rgba(248, 113, 113, 0.12);
+      border: 1px solid var(--danger);
+      color: #fecaca;
+    }
+
+    /* Portal Stats & Tables */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .stat-tile {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .stat-tile .num {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--gold-light);
+    }
+
+    .stat-tile .lbl {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+
+    th {
+      color: var(--gold-light);
+      font-weight: 600;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+
+    .hidden {
+      display: none !important;
+    }
   </style>
 </head>
 <body>
+
   <header>
     <div class="brand">
-      <span>STEMVERSE Academy</span>
-      <span id="net-badge" class="badge badge-online">ONLINE · Synced</span>
+      <div class="brand-mark">S</div>
+      <div>
+        <div class="brand-title">SchoolSaathi</div>
+        <div class="brand-sub">Offline 3D STEM &amp; Rural Classroom Portal</div>
+      </div>
     </div>
-    <div class="controls">
-      <span id="xp-pill" class="badge badge-online">XP: 120 | Streak: 4d</span>
-      <button id="btn-lang" onclick="toggleLang()">Language: English / ಕನ್ನಡ</button>
-      <button id="btn-sync" class="amber" onclick="syncQueue()">Sync Queue (<span id="sync-count">0</span>)</button>
-      <button id="role-student" class="active" onclick="setRole('student')">Student View</button>
-      <button id="role-teacher" onclick="setRole('teacher')">Teacher View</button>
+
+    <div class="nav-actions">
+      <span id="net-pill" class="pill">ONLINE · Synced</span>
+      <span id="xp-pill" class="pill">XP: 120 · 4d Streak</span>
+      <button onclick="toggleLang()" id="lang-btn">EN / ಕನ್ನಡ</button>
+      <button onclick="syncNow()">Sync (<span id="sync-count">0</span>)</button>
+      <button id="btn-student" class="active" onclick="switchRole('student')">Student</button>
+      <button id="btn-teacher" onclick="switchRole('teacher')">Teacher</button>
     </div>
   </header>
 
-  <div class="container">
-    <!-- ================= STUDENT VIEW ================= -->
-    <div id="student-view">
+  <main class="container">
+    <!-- ==================== STUDENT WORKSPACE ==================== -->
+    <section id="view-student">
       <div class="tabs">
-        <button class="active" id="tab-lab" onclick="showTab('lab')">1. 3D Lab & Guided Video</button>
-        <button id="tab-quiz" onclick="showTab('quiz')">2. Adaptive Mastery Quiz</button>
-        <button id="tab-cheat" onclick="showTab('cheat')">3. Cheat Sheet & Certificate</button>
-        <button id="tab-portal" onclick="showTab('portal')">4. PESU-Style Student Portal</button>
+        <button id="t-lab" class="active" onclick="switchTab('lab')">3D Concept Sandbox</button>
+        <button id="t-quiz" onclick="switchTab('quiz')">Adaptive Quiz</button>
+        <button id="t-sheet" onclick="switchTab('sheet')">Cheat Sheet &amp; Certificate</button>
+        <button id="t-portal" onclick="switchTab('portal')">Classroom Portal</button>
       </div>
 
-      <!-- TAB 1: 3D SANDBOX -->
-      <div id="panel-lab" class="grid">
+      <!-- TAB 1: DUMMY 3D SANDBOX -->
+      <div id="p-lab" class="grid-main">
         <div class="card">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <h2 id="ch-title" style="margin:0;">Class 9 NCERT: Force & Laws of Motion (F = m × a)</h2>
-            <select id="quality-sel" onchange="setQuality(this.value)">
-              <option value="low">Low-End Phone Mode (30 FPS)</option>
-              <option value="high" selected>Standard GPU Mode</option>
+          <div class="card-header">
+            <h2 id="chapter-heading">Class 9 NCERT · Force &amp; Laws of Motion</h2>
+            <select id="tier-select" onchange="setRenderTier(this.value)">
+              <option value="low">Battery Saver (30 FPS)</option>
+              <option value="high" selected>Smooth 3D (60 FPS)</option>
             </select>
           </div>
-          <div id="canvas-wrap">
-            <div class="overlay-hud">
-              <div class="hud-pill" id="hud-physics">Force: 20 N | Mass: 4 kg | Accel: 5.00 m/s²</div>
-              <div class="hud-pill" id="hud-state">Velocity: 0.0 m/s | Dist: 0.0 m</div>
+
+          <div class="sandbox-frame" id="sandbox-box">
+            <canvas id="simCanvas"></canvas>
+            <div class="hud-top">
+              <div class="hud-chip" id="hud-formula">F = 25 N · m = 5 kg · a = 4.02 m/s²</div>
+              <div class="hud-chip" id="hud-motion">v = 0.0 m/s · x = 0.0 m</div>
             </div>
-            <div id="video-caption" class="captions"></div>
+            <div class="caption-bar" id="guided-caption"></div>
           </div>
-          <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
-            <button class="primary" onclick="simAPI.triggerAction('push')">▶ Apply Force (Push)</button>
-            <button onclick="simAPI.triggerAction('reset')">↺ Reset Block</button>
-            <button class="amber" onclick="playGuidedVideo()">🎬 Play Interactive 3D Video</button>
+
+          <div class="controls-bar">
+            <button class="gold-btn" onclick="simAPI.triggerAction('push')">▶ Apply Force</button>
+            <button onclick="simAPI.triggerAction('reset')">↺ Reset</button>
+            <button onclick="runGuidedLesson()">🎬 Guided 3D Walkthrough</button>
           </div>
         </div>
 
         <div class="card">
-          <h2>Sandbox Parameters (Deterministic Physics Truth)</h2>
-          <div class="slider-row">
-            <label><span>Applied Force (F)</span><strong id="lbl-force">20 N</strong></label>
-            <input type="range" id="inp-force" min="5" max="100" value="20" oninput="updateSimFromUI()" />
+          <div class="card-header">
+            <h2>Simulation Controls</h2>
+            <span class="pill">Deterministic Math</span>
           </div>
-          <div class="slider-row">
-            <label><span>Block Mass (m)</span><strong id="lbl-mass">4 kg</strong></label>
-            <input type="range" id="inp-mass" min="1" max="20" value="4" oninput="updateSimFromUI()" />
+
+          <div class="control-group">
+            <label><span>Applied Force (F)</span><strong id="v-force">25 N</strong></label>
+            <input type="range" id="s-force" min="5" max="100" value="25" oninput="syncSliders()" />
           </div>
-          <div class="slider-row">
-            <label><span>Surface Friction (μ)</span><strong id="lbl-fric">0.10</strong></label>
-            <input type="range" id="inp-fric" min="0" max="0.5" step="0.05" value="0.10" oninput="updateSimFromUI()" />
+
+          <div class="control-group">
+            <label><span>Block Mass (m)</span><strong id="v-mass">5 kg</strong></label>
+            <input type="range" id="s-mass" min="1" max="20" value="5" oninput="syncSliders()" />
           </div>
-          <div class="list-item" style="margin-top:14px;">
-            <strong>Live Formula Truth:</strong><br/>
-            <span id="formula-live">Net Force = 20 - (0.10 × 4 × 9.8) = 16.08 N → a = 4.02 m/s²</span>
+
+          <div class="control-group">
+            <label><span>Surface Friction (μ)</span><strong id="v-fric">0.10</strong></label>
+            <input type="range" id="s-fric" min="0" max="0.5" step="0.05" value="0.10" oninput="syncSliders()" />
           </div>
-          <div class="list-item">
-            <strong>Quick Presets (Control API):</strong><br/>
-            <div style="display:flex; gap:6px; margin-top:6px; flex-wrap:wrap;">
-              <button onclick="simAPI.loadScenario('ice')">Frictionless Ice (μ=0)</button>
-              <button onclick="simAPI.loadScenario('heavy')">Heavy Truck Inertia (m=18kg)</button>
+
+          <div class="box-gold" id="live-math">
+            Net Force = 25.0 − (0.10 × 5 × 9.8) = 20.10 N → a = 4.02 m/s²
+          </div>
+
+          <div class="box-subtle">
+            <div style="color:var(--muted); font-size:0.78rem; margin-bottom:8px;">PRESET SCENARIOS (CONTROL API)</div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button onclick="simAPI.loadScenario('ice')">Frictionless Ice (μ = 0)</button>
+              <button onclick="simAPI.loadScenario('heavy')">Heavy Mass Inertia (18 kg)</button>
             </div>
           </div>
         </div>
       </div>
 
       <!-- TAB 2: ADAPTIVE QUIZ -->
-      <div id="panel-quiz" class="card hidden">
-        <h2>Adaptive Simulation-Verified Quiz (SM-2 Misconception Engine)</h2>
-        <p style="color:var(--muted); font-size:0.88rem; margin-bottom:12px;">
-          Questions are computed directly from the 3D physics engine. Wrong answers map to a specific misconception and launch the exact 3D scenario to fix it.
+      <div id="p-quiz" class="card hidden">
+        <div class="card-header">
+          <h2>Adaptive Mastery Check (Simulation-Verified)</h2>
+          <span class="pill">SM-2 Remediation</span>
+        </div>
+        <p style="color:var(--muted); font-size:0.85rem; margin-bottom:14px;">
+          Answer keys are computed directly by the physics engine. Wrong answers pinpoint misconceptions and open the matching 3D lab setup.
         </p>
-        <div id="quiz-box"></div>
-        <div id="quiz-feedback" class="feedback-box"></div>
+        <div id="quiz-container"></div>
+        <div id="quiz-fb" class="feedback"></div>
       </div>
 
       <!-- TAB 3: CHEAT SHEET & CERTIFICATE -->
-      <div id="panel-cheat" class="grid hidden">
+      <div id="p-sheet" class="grid-2 hidden">
         <div class="card">
-          <h2>Side-by-Side Visual & Math Cheat Sheet</h2>
+          <div class="card-header">
+            <h2>Formula &amp; Visual Cheat Sheet</h2>
+          </div>
           <table>
-            <tr><th>Law / Concept</th><th>Formula</th><th>Sandbox Action</th></tr>
+            <tr><th>Concept</th><th>Equation</th><th>3D Sandbox</th></tr>
             <tr>
-              <td>Newton's 1st Law (Inertia)</td>
-              <td>F_net = 0 ⇒ Δv = 0</td>
-              <td><button onclick="launchCheatScenario('ice')">Test in 3D</button></td>
+              <td>1st Law (Inertia)</td>
+              <td>F<sub>net</sub> = 0 ⇒ Δv = 0</td>
+              <td><button onclick="openPresetInLab('ice')">Load Scene</button></td>
             </tr>
             <tr>
-              <td>Newton's 2nd Law</td>
-              <td>F_net = m × a</td>
-              <td><button onclick="launchCheatScenario('heavy')">Test in 3D</button></td>
+              <td>2nd Law (Acceleration)</td>
+              <td>a = F<sub>net</sub> / m</td>
+              <td><button onclick="openPresetInLab('heavy')">Load Scene</button></td>
             </tr>
             <tr>
               <td>Kinetic Friction</td>
-              <td>f_k = μ × m × g</td>
-              <td><button onclick="launchCheatScenario('friction')">Test in 3D</button></td>
+              <td>f<sub>k</sub> = μ · m · g</td>
+              <td><button onclick="openPresetInLab('friction')">Load Scene</button></td>
             </tr>
           </table>
         </div>
+
         <div class="card">
-          <h2>Chapter Completion Certificate</h2>
-          <p style="color:var(--muted); font-size:0.88rem; margin-bottom:12px;">
-            Pass the adaptive quiz (score ≥ 2/3) to generate an offline-verifiable completion certificate.
+          <div class="card-header">
+            <h2>Offline Completion Certificate</h2>
+          </div>
+          <p style="color:var(--muted); font-size:0.85rem; margin-bottom:12px;">
+            Score at least 2/3 on the adaptive quiz to unlock your verifiable SchoolSaathi certificate.
           </p>
-          <div class="list-item" id="cert-preview">
-            <strong>STEMVERSE ACADEMY · VERIFIED CERTIFICATE</strong><br/>
-            Student: Nitin S (Class 9 Science — Force & Laws of Motion)<br/>
-            Status: <span id="cert-status" style="color:var(--amber);">Complete Quiz to Unlock</span>
+          <div class="box-gold">
+            <strong>SCHOOLSAATHI · VERIFIED RECORD</strong><br/>
+            Student: Nitin S · Class 9 Science<br/>
+            Chapter: Force &amp; Laws of Motion<br/>
+            Status: <span id="cert-badge">Locked (Complete Quiz)</span>
           </div>
-          <button class="primary" onclick="downloadCert()">⬇ Download Certificate (.txt/.pdf)</button>
+          <div style="margin-top:14px;">
+            <button class="gold-btn" onclick="exportCertificate()">⬇ Download Certificate</button>
+          </div>
         </div>
       </div>
 
-      <!-- TAB 4: PESU ACADEMY-STYLE PORTAL -->
-      <div id="panel-portal" class="card hidden">
-        <h2>PESU Academy–Style Rural Student Dashboard (Offline Cached)</h2>
-        <div class="stat-row">
-          <div class="stat"><div class="val" id="st-mastery">78%</div><div class="lbl">NCERT Chapter Mastery</div></div>
-          <div class="stat"><div class="val" id="st-quizzes">1</div><div class="lbl">Offline Modules Completed</div></div>
-          <div class="stat"><div class="val" id="st-bandwidth">240 KB</div><div class="lbl">Total Data Footprint</div></div>
+      <!-- TAB 4: STUDENT PORTAL -->
+      <div id="p-portal" class="card hidden">
+        <div class="card-header">
+          <h2>Student Dashboard &amp; Announcements</h2>
+          <span class="pill">Offline Cached</span>
         </div>
-        <h2 style="margin-top:10px;">School Announcements & Results</h2>
-        <div id="announcements-list">
-          <div class="list-item"><strong>[Teacher Notice]</strong> Complete Class 9 Chapter 8 (Force & Laws of Motion) 3D Lab before Friday. Works offline!</div>
-          <div class="list-item"><strong>[Result Published]</strong> Unit Test 1 — Science: 18/20 (Top strength: Inertia; Practice: Friction deceleration).</div>
+        <div class="stats-grid">
+          <div class="stat-tile"><div class="num">82%</div><div class="lbl">Chapter Mastery</div></div>
+          <div class="stat-tile"><div class="num" id="portal-done">1</div><div class="lbl">3D Labs Completed</div></div>
+          <div class="stat-tile"><div class="num">&lt; 45 KB</div><div class="lbl">Page Footprint</div></div>
+        </div>
+        <div id="notice-board">
+          <div class="box-subtle">
+            <strong style="color:var(--gold-light);">[Teacher Announcement]</strong> Practice the Frictionless Ice 3D Lab before tomorrow's class assessment. Works fully offline.
+          </div>
+          <div class="box-subtle">
+            <strong style="color:var(--gold-light);">[Assessment Result]</strong> Class 9 Science Quiz 1 — 18/20 (Strength: Inertia · Focus Area: Friction calculations).
+          </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- ================= TEACHER VIEW ================= -->
-    <div id="teacher-view" class="hidden">
-      <div class="grid">
+    <!-- ==================== TEACHER WORKSPACE ==================== -->
+    <section id="view-teacher" class="hidden">
+      <div class="grid-2">
         <div class="card">
-          <h2>AI-Assisted Partial-Credit Rubric Grading (Human-in-the-Loop)</h2>
-          <p style="color:var(--muted); font-size:0.85rem; margin-bottom:10px;">
-            AI pre-scores rural student short answers against NCERT rubrics. Teacher approves with 1 click.
-          </p>
-          <div class="list-item">
-            <strong>Student:</strong> Ravi K (Class 9B) · <strong>Question:</strong> Why do passengers lurch forward when a bus brakes suddenly?<br/>
-            <em>Student Answer:</em> "Because the bus stops but our body wants to keep moving forward due to inertia of motion."<br/>
-            <span style="color:var(--emerald);">AI Suggested Score: 2.0 / 2.0</span> — Correctly identifies inertia of motion.<br/>
-            <button class="primary" style="margin-top:6px;" onclick="approveGrade(this, 'Ravi K')">✓ Approve & Sync Grade</button>
+          <div class="card-header">
+            <h2>AI-Assisted Rubric Grading</h2>
+            <span class="pill">1-Click Approval</span>
           </div>
-          <div class="list-item">
-            <strong>Student:</strong> Ananya R (Class 9B) · <strong>Question:</strong> What happens to acceleration if mass is doubled at constant force?<br/>
-            <em>Student Answer:</em> "Acceleration also doubles because heavier objects move faster."<br/>
-            <span style="color:var(--amber);">AI Suggested Score: 0.5 / 2.0</span> — Misconception detected (a ∝ 1/m, so acceleration halves).<br/>
-            <button class="amber" style="margin-top:6px;" onclick="approveGrade(this, 'Ananya R')">✓ Approve & Assign 3D Remediation</button>
+          <div class="box-subtle">
+            <strong style="color:var(--gold-light);">Ravi K (Class 9B)</strong> · <em>Q: Why do passengers lurch forward when a bus stops suddenly?</em><br/>
+            <span style="color:var(--muted);">Response: "The bus stops, but our upper body keeps moving forward due to inertia of motion."</span><br/>
+            <div style="margin-top:6px; color:var(--success);">AI Draft Score: 2.0 / 2.0 · Matches NCERT Inertia Rubric</div>
+            <button class="gold-btn" style="margin-top:8px;" onclick="approveSubmission(this, 'Ravi K')">✓ Approve Grade</button>
+          </div>
+
+          <div class="box-subtle">
+            <strong style="color:var(--gold-light);">Ananya R (Class 9B)</strong> · <em>Q: What happens to acceleration if mass doubles at constant force?</em><br/>
+            <span style="color:var(--muted);">Response: "Acceleration doubles because heavier objects have more force."</span><br/>
+            <div style="margin-top:6px; color:var(--gold-light);">AI Draft Score: 0.5 / 2.0 · Misconception: a ∝ 1/m (acceleration halves)</div>
+            <button style="margin-top:8px;" onclick="approveSubmission(this, 'Ananya R')">✓ Approve &amp; Assign 3D Lab</button>
           </div>
         </div>
 
         <div class="card">
-          <h2>Post Offline Announcement & Class Concept Heatmap</h2>
-          <input id="new-ann" type="text" placeholder="Type announcement for rural class..." style="width:100%; padding:8px; border-radius:8px; border:1px solid #475569; background:#0f172a; color:#fff; margin-bottom:8px;" />
-          <button class="primary" onclick="postAnnouncement()">+ Publish Announcement (Queues Offline)</button>
-          <h2 style="margin-top:16px;">Class 9 Concept Struggle Heatmap</h2>
-          <table>
-            <tr><th>NCERT Topic</th><th>Class Mastery</th><th>Action</th></tr>
-            <tr><td>Newton's 1st Law (Inertia)</td><td style="color:var(--emerald);">88%</td><td>On Track</td></tr>
-            <tr><td>F = m × a Numericals</td><td style="color:var(--amber);">61%</td><td>Assign 3D Sandbox</td></tr>
-            <tr><td>Friction & Net Force</td><td style="color:var(--danger);">44%</td><td>Remedial Lab Queued</td></tr>
-          </table>
+          <div class="card-header">
+            <h2>Class Announcements &amp; Concept Heatmap</h2>
+          </div>
+          <input type="text" id="teacher-msg" placeholder="Write a notice for students (queues offline)..." />
+          <button class="gold-btn" onclick="addTeacherNotice()">Publish Notice</button>
+
+          <div style="margin-top:18px;">
+            <table>
+              <tr><th>NCERT Concept</th><th>Mastery</th><th>Status</th></tr>
+              <tr><td>Newton's 1st Law (Inertia)</td><td style="color:var(--success);">89%</td><td>On Track</td></tr>
+              <tr><td>F = m × a Numericals</td><td style="color:var(--gold-light);">64%</td><td>3D Practice</td></tr>
+              <tr><td>Friction &amp; Net Force</td><td style="color:var(--danger);">46%</td><td>Remedial Assigned</td></tr>
+            </table>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
+    </section>
+  </main>
 
-  <!-- Local three.min.js fallback to CDN only if online and local file absent -->
-  <script src="three.min.js"></script>
   <script>
-    if (typeof THREE === 'undefined') {
-      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
-    }
-  </script>
-  <script src="sim.js"></script>
-  <script>
-    // Register Service Worker for Offline Airplane Mode
-    if ('serviceWorker' in navigator) {
+    // 1. Register Service Worker safely if served over http/https (no errors on file://)
+    if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
       navigator.serviceWorker.register('sw.js').catch(() => {});
     }
 
+    // 2. Self-Contained, Zero-Glitch Isometric 3D Physics Canvas Engine
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+    const sandboxBox = document.getElementById('sandbox-box');
+
+    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let sim = {
+      force: 25,
+      mass: 5,
+      friction: 0.10,
+      velocity: 0,
+      dist: 0,
+      accel: 0,
+      pushing: false,
+      pushTimer: 0
+    };
+
+    function resizeCanvas() {
+      const rect = sandboxBox.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      canvas.width = Math.floor(rect.width * dpr);
+      canvas.height = Math.floor(rect.height * dpr);
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function setRenderTier(tier) {
+      dpr = tier === 'low' ? 1 : Math.min(window.devicePixelRatio || 1, 2);
+      resizeCanvas();
+    }
+
+    function computeStep() {
+      const normal = sim.mass * 9.8;
+      const fFric = sim.friction * normal;
+      let net = 0;
+      if (sim.pushing) {
+        net = Math.max(0, sim.force - fFric);
+      } else if (sim.velocity > 0.01) {
+        net = -fFric;
+      }
+      sim.accel = net / sim.mass;
+      return { fFric, net, accel: sim.accel };
+    }
+
+    function syncSliders() {
+      sim.force = parseFloat(document.getElementById('s-force').value);
+      sim.mass = parseFloat(document.getElementById('s-mass').value);
+      sim.friction = parseFloat(document.getElementById('s-fric').value);
+
+      document.getElementById('v-force').textContent = sim.force + ' N';
+      document.getElementById('v-mass').textContent = sim.mass + ' kg';
+      document.getElementById('v-fric').textContent = sim.friction.toFixed(2);
+
+      const { net, accel } = computeStep();
+      document.getElementById('hud-formula').textContent =
+        `F = ${sim.force} N · m = ${sim.mass} kg · a = ${accel.toFixed(2)} m/s²`;
+      document.getElementById('live-math').textContent =
+        `Net Force = ${sim.force.toFixed(1)} − (${sim.friction.toFixed(2)} × ${sim.mass} × 9.8) = ${net.toFixed(2)} N → a = ${accel.toFixed(2)} m/s²`;
+    }
+
+    const simAPI = {
+      setParams(p) {
+        if (p.force !== undefined) document.getElementById('s-force').value = p.force;
+        if (p.mass !== undefined) document.getElementById('s-mass').value = p.mass;
+        if (p.friction !== undefined) document.getElementById('s-fric').value = p.friction;
+        syncSliders();
+      },
+      triggerAction(act) {
+        if (act === 'push') {
+          sim.pushing = true;
+          sim.pushTimer = 2.0;
+          syncSliders();
+        } else if (act === 'reset') {
+          sim.pushing = false;
+          sim.pushTimer = 0;
+          sim.velocity = 0;
+          sim.dist = 0;
+          syncSliders();
+        }
+      },
+      getState() {
+        return { ...sim };
+      },
+      loadScenario(name) {
+        this.triggerAction('reset');
+        if (name === 'ice') this.setParams({ force: 25, mass: 5, friction: 0 });
+        else if (name === 'heavy') this.setParams({ force: 45, mass: 18, friction: 0.10 });
+        else if (name === 'friction') this.setParams({ force: 30, mass: 5, friction: 0.45 });
+        else this.setParams({ force: 25, mass: 5, friction: 0.10 });
+      }
+    };
+
+    // Draw clean 3D isometric cube & perspective track
+    function drawIsoBox(cx, cy, size, depth, topCol, leftCol, rightCol) {
+      const dx = depth * 0.75;
+      const dy = depth * 0.42;
+
+      // Top face
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - size);
+      ctx.lineTo(cx + dx, cy - size - dy);
+      ctx.lineTo(cx + size + dx, cy - size - dy);
+      ctx.lineTo(cx + size, cy - size);
+      ctx.closePath();
+      ctx.fillStyle = topCol;
+      ctx.fill();
+
+      // Right face
+      ctx.beginPath();
+      ctx.moveTo(cx + size, cy - size);
+      ctx.lineTo(cx + size + dx, cy - size - dy);
+      ctx.lineTo(cx + size + dx, cy - dy);
+      ctx.lineTo(cx + size, cy);
+      ctx.closePath();
+      ctx.fillStyle = rightCol;
+      ctx.fill();
+
+      // Front face
+      ctx.fillStyle = leftCol;
+      ctx.fillRect(cx, cy - size, size, size);
+      ctx.strokeStyle = 'rgba(243, 208, 107, 0.45)';
+      ctx.lineWidth = 1.2;
+      ctx.strokeRect(cx, cy - size, size, size);
+    }
+
+    let lastTs = performance.now();
+    function renderLoop(now) {
+      requestAnimationFrame(renderLoop);
+      const dt = Math.min((now - lastTs) / 1000, 0.05);
+      lastTs = now;
+
+      if (sim.pushing) {
+        sim.pushTimer -= dt;
+        if (sim.pushTimer <= 0) {
+          sim.pushing = false;
+          syncSliders();
+        }
+      }
+
+      computeStep();
+      sim.velocity = Math.max(0, sim.velocity + sim.accel * dt);
+      sim.dist += sim.velocity * dt;
+
+      const w = canvas.width / dpr;
+      const h = canvas.height / dpr;
+      ctx.save();
+      ctx.scale(dpr, dpr);
+      ctx.clearRect(0, 0, w, h);
+
+      const trackY = h * 0.72;
+
+      // 3D Perspective Track Plane
+      ctx.beginPath();
+      ctx.moveTo(30, trackY);
+      ctx.lineTo(w - 30, trackY);
+      ctx.lineTo(w - 10, trackY + 46);
+      ctx.lineTo(10, trackY + 46);
+      ctx.closePath();
+      ctx.fillStyle = '#15151a';
+      ctx.fill();
+      ctx.strokeStyle = '#332d1d';
+      ctx.stroke();
+
+      // Moving Grid Lines on Track (gives smooth infinite motion without jumping)
+      const offset = (sim.dist * 38) % 60;
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.22)';
+      ctx.lineWidth = 1;
+      for (let gx = 40 - offset; gx < w - 30; gx += 60) {
+        ctx.beginPath();
+        ctx.moveTo(gx, trackY);
+        ctx.lineTo(gx - 18, trackY + 46);
+        ctx.stroke();
+      }
+
+      // 3D Golden Block scaled by mass
+      const boxSize = 44 + (sim.mass / 20) * 34;
+      const boxDepth = boxSize * 0.55;
+      const screenX = Math.min(w * 0.62, 110 + (sim.dist * 28) % (w * 0.48));
+      drawIsoBox(screenX, trackY + 14, boxSize, boxDepth, '#f3d06b', '#d4af37', '#9a7b1c');
+
+      // Mass label on block
+      ctx.fillStyle = '#070708';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillText(sim.mass + ' kg', screenX + 10, trackY + 14 - boxSize / 2 + 4);
+
+      // Force Vector Arrow when pushing
+      if (sim.pushing) {
+        const arrowLen = 36 + sim.force * 0.65;
+        const ay = trackY + 14 - boxSize * 0.5;
+        const ax2 = screenX - 10;
+        const ax1 = ax2 - arrowLen;
+
+        ctx.strokeStyle = '#f3d06b';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(ax1, ay);
+        ctx.lineTo(ax2, ay);
+        ctx.stroke();
+
+        ctx.fillStyle = '#f3d06b';
+        ctx.beginPath();
+        ctx.moveTo(ax2, ay);
+        ctx.lineTo(ax2 - 10, ay - 6);
+        ctx.lineTo(ax2 - 10, ay + 6);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.font = 'bold 11px sans-serif';
+        ctx.fillText(sim.force + ' N', ax1, ay - 9);
+      }
+
+      document.getElementById('hud-motion').textContent =
+        `v = ${sim.velocity.toFixed(1)} m/s · x = ${sim.dist.toFixed(1)} m`;
+
+      ctx.restore();
+    }
+
+    syncSliders();
+    requestAnimationFrame(renderLoop);
+
+    // 3. UI State, Bilingual Toggle, Quiz & Offline Sync Queue
     let lang = 'en';
     let xp = 120;
-    let quizScore = 0;
-    let qIndex = 0;
-    let syncQueueItems = JSON.parse(localStorage.getItem('stemverse_sync') || '[]');
+    let qIdx = 0;
+    let score = 0;
+    let queue = JSON.parse(localStorage.getItem('schoolsaathi_queue') || '[]');
 
-    const questions = [
+    const quizBank = [
       {
-        q_en: "If Force = 20 N and Mass = 4 kg on a frictionless surface (μ = 0), what is the acceleration?",
-        q_kn: "ಘರ್ಷಣೆಯಿಲ್ಲದ ಮೇಲ್ಮೈಯಲ್ಲಿ (μ = 0) ಬಲ = 20 N ಮತ್ತು ದ್ರವ್ಯರಾಶಿ = 4 kg ಇದ್ದರೆ, ವೇಗೋತ್ಕರ್ಷ ಎಷ್ಟು?",
-        opts: ["5 m/s²", "80 m/s²", "0.2 m/s²"],
+        en: "If Force = 25 N and Mass = 5 kg on frictionless ice (μ = 0), what is acceleration?",
+        kn: "ಘರ್ಷಣೆಯಿಲ್ಲದ ಮೇಲ್ಮೈಯಲ್ಲಿ (μ = 0) ಬಲ = 25 N ಮತ್ತು ದ್ರವ್ಯರಾಶಿ = 5 kg ಇದ್ದರೆ ವೇಗೋತ್ಕರ್ಷ ಎಷ್ಟು?",
+        opts: ["5.0 m/s²", "125 m/s²", "0.2 m/s²"],
         ans: 0,
-        misconception: "You multiplied F × m instead of dividing a = F / m. Launching Frictionless Ice 3D Lab so you can observe a = 20 / 4 = 5 m/s²!",
-        fixScenario: "ice"
+        fix: "ice",
+        note: "Acceleration is a = F / m (25 / 5 = 5.0 m/s²), not F × m. Opening Frictionless Ice 3D Lab!"
       },
       {
-        q_en: "Doubling the mass of a block while keeping applied force constant will:",
-        q_kn: "ಬಲವನ್ನು ಸ್ಥಿರವಾಗಿಟ್ಟು ದ್ರವ್ಯರಾಶಿಯನ್ನು ದ್ವಿಗುಣಗೊಳಿಸಿದರೆ ವೇಗೋತ್ಕರ್ಷ ಏನಾಗುತ್ತದೆ?",
-        opts: ["Double the acceleration", "Halve the acceleration", "Keep acceleration unchanged"],
+        en: "If mass is increased to 18 kg under the same force, what happens to acceleration?",
+        kn: "ಅದೇ ಬಲದಲ್ಲಿ ದ್ರವ್ಯರಾಶಿಯನ್ನು 18 kg ಗೆ ಹೆಚ್ಚಿಸಿದರೆ ವೇಗೋತ್ಕರ್ಷ ಏನಾಗುತ್ತದೆ?",
+        opts: ["It increases", "It decreases due to higher inertia", "It stays identical"],
         ans: 1,
-        misconception: "Higher mass increases inertia, resisting acceleration (a = F/m). Loading Heavy Truck Inertia scenario in 3D!",
-        fixScenario: "heavy"
+        fix: "heavy",
+        note: "Greater mass means greater inertia (a = F/m), reducing acceleration. Loading Heavy Mass 3D Lab!"
       },
       {
-        q_en: "When applied force equals kinetic friction force, net force is zero. The moving block will:",
-        q_kn: "ಪ್ರಯೋಗಿಸಿದ ಬಲ ಮತ್ತು ಘರ್ಷಣೆ ಬಲ ಸಮಾನವಾಗಿದ್ದರೆ ಚಲಿಸುವ ವಸ್ತು ಏನಾಗುತ್ತದೆ?",
-        opts: ["Stop immediately", "Continue moving at constant velocity", "Accelerate uniformly"],
+        en: "When net external force on a moving object is zero, the object:",
+        kn: "ಚಲಿಸುವ ವಸ್ತುವಿನ ಮೇಲೆ ಒಟ್ಟು ಬಲ ಶೂನ್ಯವಾಗಿದ್ದರೆ, ಆ ವಸ್ತು:",
+        opts: ["Stops immediately", "Continues at constant velocity", "Accelerates forever"],
         ans: 1,
-        misconception: "By Newton's 1st Law, zero net force means zero acceleration—an object in motion stays at constant velocity.",
-        fixScenario: "ice"
+        fix: "ice",
+        note: "Newton's 1st Law: Zero net force produces zero acceleration, keeping velocity constant."
       }
     ];
 
-    function updateSyncUI() {
-      document.getElementById('sync-count').textContent = syncQueueItems.length;
-      const badge = document.getElementById('net-badge');
+    function refreshSyncUI() {
+      document.getElementById('sync-count').textContent = queue.length;
+      const pill = document.getElementById('net-pill');
       if (navigator.onLine) {
-        badge.className = 'badge badge-online';
-        badge.textContent = syncQueueItems.length ? 'ONLINE · Pending Sync' : 'ONLINE · Synced';
+        pill.className = 'pill';
+        pill.textContent = queue.length ? 'ONLINE · Ready to Sync' : 'ONLINE · Synced';
       } else {
-        badge.className = 'badge badge-offline';
-        badge.textContent = 'OFFLINE (Airplane Mode Active)';
+        pill.className = 'pill offline';
+        pill.textContent = 'OFFLINE · Airplane Mode';
       }
     }
-    window.addEventListener('online', updateSyncUI);
-    window.addEventListener('offline', updateSyncUI);
-    updateSyncUI();
+    window.addEventListener('online', refreshSyncUI);
+    window.addEventListener('offline', refreshSyncUI);
+    refreshSyncUI();
 
-    function queueEvent(ev) {
-      syncQueueItems.push({ ...ev, ts: new Date().toISOString() });
-      localStorage.setItem('stemverse_sync', JSON.stringify(syncQueueItems));
-      updateSyncUI();
+    function enqueue(item) {
+      queue.push({ ...item, time: new Date().toISOString() });
+      localStorage.setItem('schoolsaathi_queue', JSON.stringify(queue));
+      refreshSyncUI();
     }
 
-    function syncQueue() {
+    function syncNow() {
       if (!navigator.onLine) {
-        alert("You are currently OFFLINE. Events remain safely stored in localStorage and will sync when internet returns!");
+        alert("Offline mode active: Your progress is safely saved locally and will sync when internet returns.");
         return;
       }
-      alert("Synced " + syncQueueItems.length + " offline learning/grading records to AWS Lambda backend!");
-      syncQueueItems = [];
-      localStorage.setItem('stemverse_sync', '[]');
-      updateSyncUI();
+      alert("Synced " + queue.length + " offline records to SchoolSaathi Cloud!");
+      queue = [];
+      localStorage.setItem('schoolsaathi_queue', '[]');
+      refreshSyncUI();
     }
 
-    function setRole(role) {
-      document.getElementById('student-view').classList.toggle('hidden', role !== 'student');
-      document.getElementById('teacher-view').classList.toggle('hidden', role !== 'teacher');
-      document.getElementById('role-student').classList.toggle('active', role === 'student');
-      document.getElementById('role-teacher').classList.toggle('active', role === 'teacher');
+    function switchRole(role) {
+      document.getElementById('view-student').classList.toggle('hidden', role !== 'student');
+      document.getElementById('view-teacher').classList.toggle('hidden', role !== 'teacher');
+      document.getElementById('btn-student').classList.toggle('active', role === 'student');
+      document.getElementById('btn-teacher').classList.toggle('active', role === 'teacher');
     }
 
-    function showTab(tab) {
-      ['lab', 'quiz', 'cheat', 'portal'].forEach(t => {
-        document.getElementById('panel-' + t).classList.toggle('hidden', t !== tab);
-        document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+    function switchTab(tab) {
+      ['lab', 'quiz', 'sheet', 'portal'].forEach(t => {
+        document.getElementById('p-' + t).classList.toggle('hidden', t !== tab);
+        document.getElementById('t-' + t).classList.toggle('active', t === tab);
       });
+      if (tab === 'lab') resizeCanvas();
       if (tab === 'quiz') renderQuiz();
     }
 
     function toggleLang() {
       lang = lang === 'en' ? 'kn' : 'en';
-      document.getElementById('ch-title').textContent = lang === 'en'
-        ? "Class 9 NCERT: Force & Laws of Motion (F = m × a)"
-        : "ತರಗತಿ 9 NCERT: ಬಲ ಮತ್ತು ಚಲನೆಯ ನಿಯಮಗಳು (F = m × a)";
+      document.getElementById('chapter-heading').textContent = lang === 'en'
+        ? "Class 9 NCERT · Force & Laws of Motion"
+        : "ತರಗತಿ 9 NCERT · ಬಲ ಮತ್ತು ಚಲನೆಯ ನಿಯಮಗಳು";
       renderQuiz();
     }
 
     function renderQuiz() {
-      const box = document.getElementById('quiz-box');
-      if (qIndex >= questions.length) {
-        box.innerHTML = `<div class="list-item"><strong>Quiz Completed! Score: ${quizScore}/${questions.length}</strong></div>
-          <button class="primary" onclick="qIndex=0;quizScore=0;renderQuiz()">Retry Adaptive Quiz</button>`;
-        if (quizScore >= 2) {
-          document.getElementById('cert-status').textContent = "UNLOCKED (Score: " + quizScore + "/3)";
-          document.getElementById('cert-status').style.color = "var(--emerald)";
+      const box = document.getElementById('quiz-container');
+      const fb = document.getElementById('quiz-fb');
+      fb.style.display = 'none';
+
+      if (qIdx >= quizBank.length) {
+        box.innerHTML = `<div class="box-gold"><strong>Quiz Complete! Score: ${score} / ${quizBank.length}</strong></div>
+          <button class="gold-btn" style="margin-top:10px;" onclick="qIdx=0;score=0;renderQuiz()">Practice Again</button>`;
+        if (score >= 2) {
+          document.getElementById('cert-badge').textContent = `Unlocked (${score}/3 Passed)`;
         }
         return;
       }
-      const item = questions[qIndex];
-      const qText = lang === 'en' ? item.q_en : item.q_kn;
-      box.innerHTML = `<div class="list-item"><strong>Q${qIndex + 1}/${questions.length}:</strong> ${qText}</div>` +
-        item.opts.map((o, idx) => `<button class="quiz-opt" onclick="checkAns(${idx})">${o}</button>`).join('');
+
+      const q = quizBank[qIdx];
+      box.innerHTML = `<div class="box-subtle"><strong>Q${qIdx + 1}/${quizBank.length}:</strong> ${lang === 'en' ? q.en : q.kn}</div>` +
+        q.opts.map((opt, i) => `<button class="quiz-option" onclick="submitAnswer(${i})">${opt}</button>`).join('');
     }
 
-    function checkAns(idx) {
-      const item = questions[qIndex];
-      const fb = document.getElementById('quiz-feedback');
+    function submitAnswer(choice) {
+      const q = quizBank[qIdx];
+      const fb = document.getElementById('quiz-fb');
       fb.style.display = 'block';
-      if (idx === item.ans) {
-        quizScore++;
+
+      if (choice === q.ans) {
+        score++;
         xp += 25;
-        document.getElementById('xp-pill').textContent = `XP: ${xp} | Streak: 4d`;
-        fb.className = 'feedback-box fb-ok';
-        fb.innerHTML = `<strong>✓ Correct! (+25 XP)</strong> Verified by physics engine.`;
-        queueEvent({ type: 'quiz_pass', q: qIndex, xp });
-        qIndex++;
-        setTimeout(() => { fb.style.display = 'none'; renderQuiz(); }, 1100);
+        document.getElementById('xp-pill').textContent = `XP: ${xp} · 4d Streak`;
+        fb.className = 'feedback ok';
+        fb.innerHTML = `<strong>✓ Correct (+25 XP)</strong> — Verified by physics simulation.`;
+        enqueue({ event: 'quiz_correct', q: qIdx });
+        qIdx++;
+        setTimeout(renderQuiz, 1000);
       } else {
-        fb.className = 'feedback-box fb-err';
-        fb.innerHTML = `<strong>✗ Misconception Detected:</strong> ${item.misconception}<br/>
-          <button class="amber" style="margin-top:8px;" onclick="launchCheatScenario('${item.fixScenario}')">Open 3D Fix Scenario →</button>`;
-        queueEvent({ type: 'misconception', q: qIndex, scenario: item.fixScenario });
+        fb.className = 'feedback err';
+        fb.innerHTML = `<strong>✗ Misconception Detected:</strong> ${q.note}<br/>
+          <button class="gold-btn" style="margin-top:8px;" onclick="openPresetInLab('${q.fix}')">Fix in 3D Lab →</button>`;
+        enqueue({ event: 'misconception', fix: q.fix });
       }
     }
 
-    function launchCheatScenario(name) {
-      showTab('lab');
-      simAPI.loadScenario(name);
+    function openPresetInLab(preset) {
+      switchTab('lab');
+      simAPI.loadScenario(preset);
       simAPI.triggerAction('push');
     }
 
-    function playGuidedVideo() {
-      const cap = document.getElementById('video-caption');
-      cap.style.display = 'block';
-      const steps = [
-        { t: 0, text: "Narration: Welcome! Let's apply 20 Newtons on a 4 kg block over low friction.", fn: () => { simAPI.loadScenario('default'); simAPI.triggerAction('push'); } },
-        { t: 3500, text: "Narration: Now watch what happens when we remove friction completely on ice (μ = 0)!", fn: () => { simAPI.loadScenario('ice'); simAPI.triggerAction('push'); } },
-        { t: 7000, text: "Narration: Increasing mass to 18 kg increases inertia—acceleration drops sharply!", fn: () => { simAPI.loadScenario('heavy'); simAPI.triggerAction('push'); } },
-        { t: 10500, text: "Guided 3D Lesson Complete! (+15 XP)", fn: () => { cap.style.display = 'none'; } }
+    function runGuidedLesson() {
+      const bar = document.getElementById('guided-caption');
+      bar.style.display = 'block';
+      const timeline = [
+        { t: 0, msg: "Step 1: Applying 25 N on a 5 kg block with normal surface friction.", fn: () => { simAPI.loadScenario('default'); simAPI.triggerAction('push'); } },
+        { t: 3200, msg: "Step 2: Removing friction on ice (μ = 0) — notice constant velocity after push!", fn: () => { simAPI.loadScenario('ice'); simAPI.triggerAction('push'); } },
+        { t: 6400, msg: "Step 3: Increasing mass to 18 kg — higher inertia slows acceleration.", fn: () => { simAPI.loadScenario('heavy'); simAPI.triggerAction('push'); } },
+        { t: 9600, msg: "Guided Walkthrough Complete (+15 XP)", fn: () => { bar.style.display = 'none'; } }
       ];
-      steps.forEach(s => setTimeout(() => {
-        cap.textContent = s.text;
-        s.fn();
-        if ('speechSynthesis' in window) {
-          window.speechSynthesis.cancel();
-          window.speechSynthesis.speak(new SpeechSynthesisUtterance(s.text.replace('Narration: ', '')));
-        }
-      }, s.t));
+      timeline.forEach(step => setTimeout(() => {
+        bar.textContent = step.msg;
+        step.fn();
+      }, step.t));
     }
 
-    function approveGrade(btn, student) {
+    function approveSubmission(btn, name) {
       btn.textContent = "✓ Approved & Queued";
       btn.disabled = true;
-      queueEvent({ type: 'teacher_grade_approved', student });
+      enqueue({ event: 'grade_approved', student: name });
     }
 
-    function postAnnouncement() {
-      const inp = document.getElementById('new-ann');
+    function addTeacherNotice() {
+      const inp = document.getElementById('teacher-msg');
       if (!inp.value.trim()) return;
       const div = document.createElement('div');
-      div.className = 'list-item';
-      div.innerHTML = `<strong>[New Teacher Notice]</strong> ${inp.value}`;
-      document.getElementById('announcements-list').prepend(div);
-      queueEvent({ type: 'announcement', text: inp.value });
+      div.className = 'box-subtle';
+      div.innerHTML = `<strong style="color:var(--gold-light);">[New Teacher Notice]</strong> ${inp.value}`;
+      document.getElementById('notice-board').prepend(div);
+      enqueue({ event: 'notice_posted', text: inp.value });
       inp.value = '';
-      alert("Announcement saved locally & added to Offline Sync Queue!");
+      alert("Notice saved locally and queued for offline sync!");
     }
 
-    function downloadCert() {
-      const text = "STEMVERSE ACADEMY CERTIFICATE\nAwarded to: Nitin S\nCourse: Class 9 NCERT Science — Force & Laws of Motion\nVerified Offline Mastery Score: " + quizScore + "/3\nTeam deepcoders (wHACKiest 2026)";
-      const blob = new Blob([text], { type: 'text/plain' });
+    function exportCertificate() {
+      const content = [
+        "==========================================",
+        "       SCHOOLSAATHI COMPLETION RECORD     ",
+        "==========================================",
+        "Student: Nitin S",
+        "Module: Class 9 Science - Force & Motion",
+        "Verified Score: " + score + " / 3",
+        "Team deepcoders | wHACKiest 2026"
+      ].join("\n");
       const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = "STEMVERSE_Certificate_NitinS.txt";
+      a.href = URL.createObjectURL(new Blob([content], { type: 'text/plain' }));
+      a.download = "SchoolSaathi_Certificate.txt";
       a.click();
     }
   </script>
